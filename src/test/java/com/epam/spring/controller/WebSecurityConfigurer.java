@@ -3,7 +3,9 @@ package com.epam.spring.controller;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,6 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import java.util.List;
 
 @Configuration
+@EnableWebSecurity
 public class WebSecurityConfigurer {
 
     @Bean
@@ -31,8 +34,10 @@ public class WebSecurityConfigurer {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests()
+        http.csrf().disable()
+                .authorizeHttpRequests()
                 .requestMatchers("/**").permitAll()
+                .requestMatchers(HttpMethod.POST,"/**").permitAll()
                 .and()
                 .httpBasic();
         return http.build();

@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -39,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(CarController.class)
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
-@ContextConfiguration(classes = CarController.class)
+@ContextConfiguration(classes = {CarController.class, WebSecurityConfigurer.class})
 class CarControllerTest {
     private ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
@@ -106,7 +107,9 @@ class CarControllerTest {
         CarDto carDto = getCarDto();
         when(carService.addCar(carDto, 1)).thenReturn(carDto);
 
-        mockMvc.perform(post("/car/{userId}", 1))
+        mockMvc.perform(post("/car/{userId}", 1)
+                .content(objectMapper.writeValueAsString(carDto))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(content().json(objectMapper.writeValueAsString(carDto)));
@@ -119,7 +122,9 @@ class CarControllerTest {
         CarDto carDto = getCarDto();
         when(carService.updateCar(carDto, 1)).thenReturn(carDto);
 
-        mockMvc.perform(patch("/car/{userId}", 1))
+        mockMvc.perform(patch("/car/{userId}", 1)
+                .content(objectMapper.writeValueAsString(carDto))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(carDto)));
@@ -132,6 +137,7 @@ class CarControllerTest {
         carService.deleteCarById(1);
 
         mockMvc.perform(delete("/car/{id}", 1))
+                .andDo(print())
                 .andExpect(status().isNoContent());
     }
 

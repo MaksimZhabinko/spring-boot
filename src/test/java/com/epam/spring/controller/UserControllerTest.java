@@ -50,7 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(UserController.class)
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
-@ContextConfiguration(classes = UserController.class)
+@ContextConfiguration(classes = {UserController.class, WebSecurityConfigurer.class})
 class UserControllerTest {
     private ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
